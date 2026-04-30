@@ -1,0 +1,22 @@
+import streamlit as st
+import pandas as pd
+st.set_page_config(page_title="Sales Dashboard",layout="wide")
+df=pd.read_csv("data/sales.csv")
+df["Date"]=pd.to_datetime(df["Date"])
+st.title("Sales and Revenue Dashboard")
+ts=df["Sales"].sum()
+tr=df["Revenue"].sum()
+c1,c2=st.columns(2)
+c1.metric("Total Sales",ts)
+c2.metric("Total Revenue",tr)
+st.sidebar.header("Filters")
+r=st.sidebar.multiselect("Select Region",df["Region"].unique(),default=df["Region"].unique())
+f=df[df["Region"].isin(r)]
+st.subheader("Revenue Trend")
+st.line_chart(f.groupby("Date")["Revenue"].sum())
+st.subheader("Top Products")
+st.bar_chart(f.groupby("Product")["Revenue"].sum())
+st.subheader("Category Revenue")
+st.write(f.groupby("Category")["Revenue"].sum())
+st.subheader("Data")
+st.dataframe(f)
